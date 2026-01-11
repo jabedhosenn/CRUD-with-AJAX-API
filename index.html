@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Product List</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background: #f5f5f5;
+            font-family: 'Varela Round', sans-serif;
+            font-size: 14px;
+        }
+
+        .table-wrapper {
+            background: #fff;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 4px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-xl">
+        <div class="table-wrapper">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>Manage <b>Products</b></h4>
+                <a href="add-product.html" class="btn btn-success">
+                    Add New Product
+                </a>
+            </div>
+
+            <!-- Table -->
+            <table class="table table-bordered table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Product Name</th>
+                        <th>Product Code</th>
+                        <th>Unit Price</th>
+                        <th>Qty</th>
+                        <th>Total Price</th>
+                        <th width="120">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="product-data">
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        getProducts();
+        async function getProducts() {
+            let URL = 'https://crud.teamrabbil.com/api/v1/ReadProduct';
+            let response = await axios.get(URL);
+            let products = response.data['data'];
+
+            products.forEach((item, index) => {
+                document.getElementById('product-data').innerHTML += (`
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${item['ProductName']}</td>
+                    <td>${item['ProductCode']}</td>
+                    <td>${item['UnitPrice']}</td>
+                    <td>${item['Qty']}</td>
+                    <td>${item['TotalPrice']}</td>
+                    <td>
+                        <div class="d-flex justify-content-between">
+                            <button onclick="goToUpdate('${item['_id']}')" 
+                               class="btn btn-sm btn-info mr-2">Edit</button>
+
+                            <button 
+                               class="btn btn-sm btn-danger"
+                               onclick="deleteProduct('${item['_id']}')">
+                               Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `);
+            });
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Are you sure?')) return;
+
+            let URL = `https://crud.teamrabbil.com/api/v1/DeleteProduct/${id}`;
+            await axios.get(URL);
+            document.getElementById('product-data').innerHTML = "";
+            getProducts(); // refresh list
+        }
+
+        function goToUpdate(id) {
+            window.location = `edit-product.html?id=${id}`;
+        }
+    </script>
+
+
+</body>
+
+</html>
